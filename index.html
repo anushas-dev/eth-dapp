@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Web3 First dApp</title>
+  </head>
+  <body>
+<div class="text-center">
+
+  <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-100 md:text-5xl lg:text-6xl dark:text-gray-500">My First dApp</h1>
+  <p class="mb-6 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Trying to interact with this mood <span class="text-blue-600 dark:text-blue-500">Smart Contract #1</span> </p>
+
+
+<form class="max-w-md mx-auto">   
+  <div class="relative">
+      <input type="search" id="mood" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-white-700 dark:border-gray-600 dark:placeholder-white-400 dark:text-grey dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+  </div>
+</form>
+<br>
+<button onClick="getMood()" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Get Mood</button>
+<button onClick="setMood()" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Set Mood</button>
+<p id="showMood"></p>
+<br>  
+    </div>
+  </body>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+  <script>
+    const MoodContractAddress = "0xEbA271Bc6D2Ab7930cbB4d1095F045796478F8B6"; 
+    const MoodContractABI = [
+	{
+		"inputs": [],
+		"name": "getMood",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_mood",
+				"type": "string"
+			}
+		],
+		"name": "setMood",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+];
+    let MoodContract;
+    let signer;
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    provider.send("eth_requestAccounts", []).then(() => {
+  provider.listAccounts().then((accounts) => {
+    signer = provider.getSigner(accounts[0]);
+    MoodContract = new ethers.Contract(
+      MoodContractAddress,
+      MoodContractABI,
+      signer
+    );
+  });
+});
+async function getMood() {
+  const getMoodPromise = MoodContract.getMood();
+  const Mood = await getMoodPromise;
+  alert("Mood fetched: " + Mood);
+}
+
+async function setMood() {
+  const mood = document.getElementById("mood").value;
+  const setMoodPromise = MoodContract.setMood(mood);
+  await setMoodPromise;
+  alert("Mood is set to: " + mood);
+}
+  </script>
+</html>
